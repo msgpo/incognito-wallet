@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {View} from '@src/components/core';
+import {View, Text} from '@src/components/core';
 import icShield from '@assets/images/icons/ic_shield_btn.png';
 import icSend from '@assets/images/icons/ic_send_btn.png';
 import icReceive from '@assets/images/icons/ic_receive_btn.png';
@@ -24,6 +24,8 @@ import {CONSTANT_EVENTS} from '@src/constants';
 import LocalDatabase from '@utils/LocalDatabase';
 import {withdraw} from '@services/api/withdraw';
 import {logEvent} from '@services/firebase';
+import icStake from '@assets/images/icons/stake_icon.png';
+import RightMenu from '@screens/Stake/features/RightMenu';
 import styles from './style';
 
 const sendItem = {
@@ -56,7 +58,9 @@ const powerItem = {
   title: 'Power',
   route: ROUTE_NAMES.Community,
   onPress: () => {
-    LinkingService.openUrl('https://node.incognito.org/payment.html?utm_source=app&utm_medium=homepage%20app&utm_campaign=pnode');
+    LinkingService.openUrl(
+      'https://node.incognito.org/payment.html?utm_source=app&utm_medium=homepage%20app&utm_campaign=pnode',
+    );
   },
 };
 
@@ -95,6 +99,17 @@ const buttons = [
   pappItem,
   powerItem,
   pUniswapItem,
+  {
+    image: icStake,
+    title: 'Stake',
+    route: ROUTE_NAMES.Stake,
+    params: {
+      navigationOptions: {
+        title: 'Staking PRV',
+        headerRight: <RightMenu />,
+      },
+    },
+  },
 ];
 
 const Home = ({navigation}) => {
@@ -152,7 +167,9 @@ const Home = ({navigation}) => {
               image={item.image}
               title={item.title}
               disabled={isDisabled(item)}
-              onPress={item.onPress || (() => goToScreen(item.route, item.params, item.event))}
+              onPress={
+                item.onPress || (() => goToScreen(item.route, item.params))
+              }
             />
           </View>
         ))}
