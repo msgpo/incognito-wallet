@@ -12,7 +12,7 @@ export default function configureStore(preloadedState) {
   const persistConfig = {
     key: 'root',
     storage: AsyncStorage,
-    whitelist: ['receivers'],
+    whitelist: ['receivers', 'stake'],
     stateReconciler: autoMergeLevel2,
   };
   const persistedReducer = persistReducer(persistConfig, rootReducer);
