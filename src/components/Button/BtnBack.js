@@ -1,17 +1,17 @@
 import React from 'react';
 import {StyleSheet, TouchableOpacity} from 'react-native';
-import {ThreeDotsVerIcon} from '@src/components/Icons';
+import {BackIcon} from '@src/components/Icons';
 
 const styled = StyleSheet.create({});
 
-const BtnThreeDotsVer = props => {
+const BtnBack = props => {
   return (
     <TouchableOpacity {...props}>
-      <ThreeDotsVerIcon />
+      <BackIcon />
     </TouchableOpacity>
   );
 };
 
-BtnThreeDotsVer.propTypes = {};
+BtnBack.propTypes = {};
 
-export default BtnThreeDotsVer;
+export default BtnBack;

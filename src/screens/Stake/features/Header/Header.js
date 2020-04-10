@@ -3,11 +3,7 @@ import {View, StyleSheet, Text} from 'react-native';
 import {activeFlowSelector} from '@screens/Stake/stake.selector';
 import {useSelector, useDispatch} from 'react-redux';
 import BackButton from '@src/components/BackButton';
-import {
-  STEP_FLOW,
-  DEPOSIT_FLOW,
-  WITHDRAW_FLOW,
-} from '@screens/Stake/stake.constant';
+import {STEP_FLOW} from '@screens/Stake/stake.constant';
 import {actionToggleModal} from '@src/components/Modal';
 import {FONT, COLORS, THEME} from '@src/styles';
 import {actionChangeFLowStep} from '../../stake.actions';

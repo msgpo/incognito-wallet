@@ -4,13 +4,12 @@ import {COLORS, FONT} from '@src/styles';
 export const styled = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.lightGrey5,
+    backgroundColor: COLORS.white,
   },
   wrapper: {
     flex: 1,
     padding: 20,
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
     margin: 20,
     borderRadius: 10,
   },
@@ -34,14 +33,13 @@ export const styled = StyleSheet.create({
   },
   desc: {
     textAlign: 'center',
-    marginTop: 10,
-    fontFamily: FONT.NAME.regular,
-    fontSize: FONT.SIZE.regular,
-    lineHeight: FONT.SIZE.regular + 6,
+    marginTop: 30,
+    fontFamily: FONT.NAME.medium,
+    fontSize: FONT.SIZE.large,
+    lineHeight: FONT.SIZE.large + 6,
     color: COLORS.black,
   },
   title: {
-    textTransform: 'uppercase',
     fontFamily: FONT.NAME.regular,
     fontSize: FONT.SIZE.medium,
     lineHeight: FONT.SIZE.medium + 6,
@@ -53,21 +51,28 @@ export const styled = StyleSheet.create({
   },
   balance: {
     fontFamily: FONT.NAME.medium,
-    fontSize: FONT.SIZE.superLarge,
-    lineHeight: FONT.SIZE.superLarge + 6,
+    fontSize: FONT.SIZE.superLarge + 5,
+    lineHeight: FONT.SIZE.superLarge + 10,
     color: COLORS.black,
+    marginTop: 10
   },
   symbol: {
     fontFamily: FONT.NAME.regular,
     fontSize: FONT.SIZE.medium,
     lineHeight: FONT.SIZE.medium + 6,
     color: COLORS.black,
-    marginHorizontal: 5,
   },
   btnStake: {
-    marginTop: 65,
+    marginTop: 25,
   },
   arrow: {
     justifyContent: 'center',
+  },
+  background: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover', // or 'stretch'
+    position: 'absolute',
+    flex: 1,
   },
 });

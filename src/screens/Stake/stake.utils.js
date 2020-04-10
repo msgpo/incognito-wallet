@@ -40,7 +40,10 @@ export const calInterestRate = (balance = 0, rate = 50, rewardDate) => {
     }
     const interestRate =
       (balance * (rate / 100) * duration) / (365 * 24 * 60 * 60 * 1000);
-    return interestRate;
+    if (!isNaN(interestRate)) {
+      return interestRate;
+    }
+    return 0;
   } catch (error) {
     new ExHandler(error).showErrorToast();
     return 0;

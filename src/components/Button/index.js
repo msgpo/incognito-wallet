@@ -6,3 +6,4 @@ export {default as BtnQuestion} from './BtnQuestion';
 export {default as BtnThreeDotsHor} from './BtnThreeDotsHor';
 export {default as BtnHistory} from './BtnHistory';
 export {default as BtnThreeDotsVer} from './BtnThreeDotsVer';
+export {default as BtnBack} from './BtnBack';
