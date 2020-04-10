@@ -52,9 +52,9 @@ export default {
   UniswapHistoryDetail: 'UniswapHistoryDetail',
   WhySend: 'WhySend',
   WhyReceive: 'WhyReceive',
-  PriceChartCrypto: 'PriceChartCrypto',
   Stake: 'Stake',
   StakeHistory: 'StakeHistory',
   StakeRecoverAccount: 'StakeRecoverAccount',
   StakeHistoryDetail: 'StakeHistoryDetail',
+  PriceChartCrypto: 'PriceChartCrypto',
 };
