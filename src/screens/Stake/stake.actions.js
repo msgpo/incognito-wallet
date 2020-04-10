@@ -175,7 +175,6 @@ export const actionFetchCreateStake = ({amount, fee}) => async (
       ),
       await getSignPublicKey(pStakeAccount?.PrivateKey),
     ]);
-    console.log('tx', tx);
     if (!tx?.txId) {
       throw Error('No txId');
     }
@@ -194,7 +193,6 @@ export const actionFetchCreateStake = ({amount, fee}) => async (
       ]);
     }
   } catch (error) {
-    console.log('error', error);
     await dispatch(actionFetchFailCreateStake());
     throw Error(error);
   }
@@ -242,7 +240,6 @@ export const actionFetchCreateUnStake = ({amount}) => async (
       SignEncode: signEncode,
     };
     const payload = await apiUnStake(data);
-    console.log('payload', payload);
     if (payload?.ID) {
       return await new Promise.all([
         await dispatch(actionFetchedCreateUnStake(payload)),

@@ -102,6 +102,7 @@ const buttons = [
       navigationOptions: {
         title: 'Staking PRV',
         headerRight: <RightMenu />,
+        headerBackground: '#00000000'
       },
     },
   },
