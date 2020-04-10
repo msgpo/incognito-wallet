@@ -14,6 +14,7 @@ import {DEPOSIT_FLOW, STEP_FLOW} from './stake.constant';
 import {stakeDataSelector} from './stake.selector';
 import {calInterestRate} from './stake.utils';
 import Header from './stake.header';
+import StakePoolCommunity from './features/StakePoolCommunity';
 
 const Stake = () => {
   const dispatch = useDispatch();
@@ -124,8 +125,9 @@ const Stake = () => {
           btnStyle={styled.btnStake}
           onPress={handleStartStake}
         />
-        <Modal shouldCloseModalWhenTapOverlay={false} />
+        <StakePoolCommunity />
       </View>
+      <Modal shouldCloseModalWhenTapOverlay={false} />
     </View>
   );
 };
