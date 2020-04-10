@@ -1,6 +1,7 @@
 import React from 'react';
 import {Image} from 'react-native';
 import srcAccountIcon from '@src/assets/images/icons/ic_account_active.png';
+import PropTypes from 'prop-types';
 
 const AccountIcon = props => {
   const defaultStyle = {
@@ -9,8 +10,22 @@ const AccountIcon = props => {
   };
   const {style, source, ...rest} = props;
   return (
-    <Image source={srcAccountIcon} style={[defaultStyle, style]} {...rest} />
+    <Image
+      source={source ? source : srcAccountIcon}
+      style={[defaultStyle, style]}
+      {...rest}
+    />
   );
+};
+
+AccountIcon.defaultProps = {
+  source: srcAccountIcon,
+  style: {},
+};
+
+AccountIcon.propTypes = {
+  style: PropTypes.any,
+  source: PropTypes.any,
 };
 
 export default AccountIcon;

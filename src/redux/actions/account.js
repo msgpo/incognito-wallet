@@ -333,3 +333,15 @@ export const actionSendNativeToken = ({
     throw Error(error);
   }
 };
+
+export const actionLoadAllBalance = () => async (dispatch, getState) => {
+  try {
+    const state = getState();
+    const accounts = accountSeleclor.listAccount(state);
+    await new Promise.all(
+      accounts.map(async account => await dispatch(getBalance(account))),
+    );
+  } catch (error) {
+    throw Error(error);
+  }
+};

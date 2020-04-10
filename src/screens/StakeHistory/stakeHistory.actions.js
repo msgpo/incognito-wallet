@@ -7,7 +7,7 @@ import {
 } from './stakeHistory.constant';
 import {api} from './stakeHistory.services';
 import {stakeHistorySelector} from './stakeHistory.selector';
-import {mappingData, mockupData} from './stakeHistory.utils';
+import {mappingData} from './stakeHistory.utils';
 
 export const actionChangePage = payload => ({
   type: ACTION_CHANGE_PAGE,
@@ -34,15 +34,12 @@ export const actionFetch = ({loadmore = true}) => async (
   try {
     const state = getState();
     const {isFetching, data} = stakeHistorySelector(state);
-    const {page: pageCurrent, limit, items: oldItems, over} = data;
-    if (isFetching || over) {
+    const {page: pageCurrent, limit, items: oldItems} = data;
+    if (isFetching) {
       return;
     }
     const {PaymentAddress} = pStakeAccountSelector(state);
     const page = loadmore ? pageCurrent : 1;
-    if (isFetching) {
-      return;
-    }
     await dispatch(actionFetching());
     const {Items} = await api({
       paymentAddress: PaymentAddress,
@@ -59,7 +56,6 @@ export const actionFetch = ({loadmore = true}) => async (
     };
     await dispatch(actionFetched(payload));
   } catch (error) {
-    console.log('error', error);
     await dispatch(actionFetchFail());
   }
 };
