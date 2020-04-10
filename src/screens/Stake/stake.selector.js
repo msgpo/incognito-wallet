@@ -74,14 +74,14 @@ export const activeFlowSelector = createSelector(
       hook.btnSubmitStatus = createStake.backup
         ? 'OK'
         : 'Back up your account';
-      hook.titleStatus = 'Deposit successfully';
+      hook.titleStatus = 'Deposit is in progress';
       hook.warningStatus =
           'Back up your staking account to keep your assets safe.';
       break;
     case WITHDRAW_FLOW:
       hook.btnSubmitAmount = 'Withdraw';
       hook.btnSubmitStatus = 'Continue trading';
-      hook.titleStatus = 'Withdrawal successful!';
+      hook.titleStatus = 'Withdrawal is in progress';
       break;
     default:
       break;
