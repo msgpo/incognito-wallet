@@ -5,27 +5,31 @@ import {BtnDefault} from '@src/components/Button';
 import {useDispatch, useSelector} from 'react-redux';
 import format from '@src/utils/format';
 import {ArrowUpIcon} from '@src/components/Icons';
-import {useIsFocused} from 'react-navigation-hooks';
+import {getDecimalSeparator} from '@src/resources/separator';
 import {styled} from './stake.styled';
 import withStake from './stake.enhance';
 import StakeModal from './stake.modal';
 import {actionChangeFLowStep} from './stake.actions';
 import {DEPOSIT_FLOW, STEP_FLOW} from './stake.constant';
 import {stakeDataSelector} from './stake.selector';
-import {getBalanceByRatePerSecond} from './stake.utils';
+import {calInterestRate} from './stake.utils';
 
 const Stake = () => {
-  const isFocused = useIsFocused();
   const dispatch = useDispatch();
-  const {balance, symbol, pDecimals, staked, currentRewardRate} = useSelector(
-    stakeDataSelector,
-  );
+  const {
+    balance,
+    symbol,
+    pDecimals,
+    staked,
+    currentRewardRate,
+    rewardDate,
+  } = useSelector(stakeDataSelector);
   const initialState = {
-    balanceCurrent: balance,
+    balanceCurrent: 0,
     duration: 1,
   };
   const [state, setState] = React.useState(initialState);
-  const {balanceCurrent, duration} = state;
+  const {balanceCurrent} = state;
   const handleStartStake = async () => {
     await new Promise.all([
       dispatch(
@@ -42,34 +46,25 @@ const Stake = () => {
       ),
     ]);
   };
-  const handleCalBalance = async () => {
-    const balanceCurrentPerSecond = getBalanceByRatePerSecond(
-      balanceCurrent,
+  const handleReCalBalance = async () => {
+    const interestRate = calInterestRate(
+      balance,
       currentRewardRate,
-      duration,
+      rewardDate,
     );
     await setState({
       ...state,
-      balanceCurrent: balanceCurrentPerSecond,
-      duration: duration + 1,
+      balanceCurrent: balance + interestRate,
     });
   };
   React.useEffect(() => {
-    if (balance !== 0 && isFocused) {
-      const intervalId = setInterval(handleCalBalance, 1000);
+    if (balance !== 0) {
+      const intervalId = setInterval(handleReCalBalance, 100);
       return () => {
         clearInterval(intervalId);
       };
     }
-  }, [duration, balance, balanceCurrent]);
-  React.useEffect(() => {
-    if (isFocused) {
-      setState({
-        ...initialState,
-        balanceCurrent: balance,
-      });
-    }
-  }, [isFocused, balance]);
+  }, []);
   return (
     <SafeAreaView style={styled.container}>
       <View style={styled.wrapper}>
@@ -81,7 +76,9 @@ const Stake = () => {
               numberOfLine={1}
               ellipsizeMode="middle"
             >
-              {format.amount(balanceCurrent, pDecimals)}
+              {(balanceCurrent / 1e9)
+                .toFixed(6)
+                .replace('.', getDecimalSeparator())}
             </Text>
             <Text style={styled.symbol}>{symbol}</Text>
             <View style={styled.arrow}>
@@ -101,7 +98,7 @@ const Stake = () => {
           </Text>
         </Text>
       </View>
-      <Modal />
+      <Modal shouldCloseModalWhenTapOverlay={false} />
     </SafeAreaView>
   );
 };

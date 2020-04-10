@@ -99,9 +99,10 @@ const enhance = WrappedComp => props => {
 
   const handleCalcFee = async () => {
     try {
-      const shouldFetchFee = validAmount && activeFlow === DEPOSIT_FLOW;
+      const shouldFetchFee =
+        validAmount && activeFlow === DEPOSIT_FLOW && !fee.isFetched;
       if (shouldFetchFee) {
-        await dispatch(actionFetchFee({amount}));
+        await dispatch(actionFetchFee());
       }
     } catch (error) {
       new ExHandler(error).showErrorToast();

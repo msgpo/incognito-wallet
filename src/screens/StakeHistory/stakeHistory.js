@@ -16,7 +16,7 @@ import {styled} from './stakeHistory.styled';
 import withStakeHistory from './stakeHistory.enhance';
 
 const Item = props => {
-  const {type, status, amount, statusColor} = props;
+  const {type, status, amount, statusColor, symbol} = props;
   const navigation = useNavigation();
   const handleOnPress = () => {
     navigation.navigate(routeNames.StakeHistoryDetail, {
@@ -28,7 +28,7 @@ const Item = props => {
       <View style={styled.item}>
         <View style={styled.hook}>
           <Text style={styled.type}>{type}</Text>
-          <Text style={styled.amount}>{amount}</Text>
+          <Text style={styled.amount}>{`${amount} ${symbol}`}</Text>
         </View>
         <View style={styled.action}>
           <Text style={[styled.status, {color: statusColor}]}>{status}</Text>

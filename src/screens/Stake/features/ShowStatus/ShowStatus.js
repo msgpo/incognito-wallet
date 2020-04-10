@@ -5,9 +5,8 @@ import {useSelector, useDispatch} from 'react-redux';
 import {
   activeFlowSelector,
   createStakeSelector,
+  stakeDataSelector,
 } from '@screens/Stake/stake.selector';
-import {selectedPrivacySeleclor} from '@src/redux/selectors';
-import {CONSTANT_COMMONS} from '@src/constants';
 import {COLORS, FONT} from '@src/styles';
 import {BtnDefault} from '@src/components/Button';
 import PropTypes from 'prop-types';
@@ -17,7 +16,8 @@ import routeNames from '@src/router/routeNames';
 import {DEPOSIT_FLOW} from '@screens/Stake/stake.constant';
 import Hook from '@screens/Stake/features/Hook';
 import format from '@src/utils/format';
-import {actionBackupCreateStake} from '@screens/Stake/stake.actions';
+import LocalDatabase from '@src/utils/LocalDatabase';
+import withShowStatus from './ShowStatus.enhance';
 
 const styled = StyleSheet.create({
   container: {
@@ -79,9 +79,7 @@ const ShowStatus = () => {
     activeFlow,
   } = useSelector(activeFlowSelector);
   const {backup} = useSelector(createStakeSelector);
-  const {symbol, pDecimals} = useSelector(
-    selectedPrivacySeleclor.getPrivacyDataByTokenID,
-  )(CONSTANT_COMMONS.PRV_TOKEN_ID);
+  const {symbol, pDecimals} = useSelector(stakeDataSelector);
   const hookFactories = [
     {
       id: 0,
@@ -100,8 +98,8 @@ const ShowStatus = () => {
       if (backup) {
         break;
       }
+      await LocalDatabase.saveBackupStakeKey();
       navigation.navigate(routeNames.BackupKeys);
-      await dispatch(actionBackupCreateStake());
       break;
     }
     default:
@@ -137,4 +135,4 @@ BlockChecked.propTypes = {
   title: PropTypes.string.isRequired,
 };
 
-export default ShowStatus;
+export default withShowStatus(ShowStatus);

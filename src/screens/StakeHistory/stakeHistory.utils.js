@@ -19,8 +19,8 @@ const STATUS_HISTORY_COLOR = {
 
 export const TYPE_HISTORY = {
   0: 'None',
-  1: 'Stake',
-  2: 'Un Stake',
+  1: 'Deposit',
+  2: 'Withdraw',
   3: 'Auto Stake On',
   4: 'Auto Stake Off',
   5: 'Reward',

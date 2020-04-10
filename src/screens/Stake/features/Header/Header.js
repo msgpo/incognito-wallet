@@ -10,6 +10,7 @@ import {
 } from '@screens/Stake/stake.constant';
 import {actionToggleModal} from '@src/components/Modal';
 import {FONT, COLORS, THEME} from '@src/styles';
+import {actionChangeFLowStep} from '../../stake.actions';
 
 const styled = StyleSheet.create({
   container: {
@@ -36,15 +37,25 @@ const styled = StyleSheet.create({
 
 const Header = () => {
   const dispatch = useDispatch();
-  const activedFlow = useSelector(activeFlowSelector);
-  const {step, headerTitle} = activedFlow;
+  const {step, headerTitle, activeFlow} = useSelector(activeFlowSelector);
   const handleBack = async () => {
-    await dispatch(
-      actionToggleModal({
-        visible: false,
-        data: null,
-      }),
-    );
+    switch (step) {
+    case STEP_FLOW.TYPE_AMOUNT: {
+      return await dispatch(
+        actionChangeFLowStep({
+          activeFlow,
+          step: STEP_FLOW.CHOOSE_ACCOUNT,
+        }),
+      );
+    }
+    default:
+      await dispatch(
+        actionToggleModal({
+          visible: false,
+          data: null,
+        }),
+      );
+    }
   };
   if (step === STEP_FLOW.SHOW_STATUS) {
     return null;

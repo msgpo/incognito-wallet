@@ -1,12 +1,8 @@
 import {getEstimateFeeForNativeToken} from '@src/services/wallet/RpcClientService';
 import convert from '@src/utils/convert';
 import {getSignPublicKey, signPoolWithdraw} from '@src/services/gomobile';
-import {
-  actionSendNativeToken,
-  getBalance as getBalanceAccount,
-} from '@src/redux/actions/account';
+import {actionSendNativeToken} from '@src/redux/actions/account';
 import {CONSTANT_COMMONS} from '@src/constants';
-import {accountSeleclor} from '@src/redux/selectors';
 import {
   ACTION_FETCHING,
   ACTION_FETCHED,
@@ -38,6 +34,7 @@ import {
   activeFlowSelector,
   createUnStakeSelector,
   createStakeSelector,
+  feeStakeSelector,
 } from './stake.selector';
 import {mappingData} from './stake.utils';
 
@@ -58,7 +55,6 @@ export const actionFetch = () => async (dispatch, getState) => {
   try {
     const state = getState();
     const pStakeAccount = pStakeAccountSelector(state);
-    const accounts = accountSeleclor.listAccount(state);
     const {isFetching} = stakeSelector(state);
     if (!pStakeAccount) {
       throw Error('pStake account can\'t not found!');
@@ -70,9 +66,6 @@ export const actionFetch = () => async (dispatch, getState) => {
     const [dataMasterAddress, dataStakerInfo] = await new Promise.all([
       await apiGetMasterAddress(),
       await apiGetStakerInfo({paymentAddress: pStakeAccount?.PaymentAddress}),
-      await accounts.map(
-        async account => await dispatch(getBalanceAccount(account)),
-      ),
     ]);
     const payload = mappingData(dataMasterAddress, dataStakerInfo);
     await dispatch(actionFetched(payload));
@@ -112,14 +105,18 @@ export const actionFetchFailFee = () => ({
   type: ACTION_FETCH_FAIL_FEE,
 });
 
-export const actionFetchFee = ({amount}) => async (dispatch, getState) => {
+export const actionFetchFee = () => async (dispatch, getState) => {
   try {
     const state = getState();
     const {from, to, walletAccount} = activeFlowSelector(state);
-    const {pDecimals} = stakeDataSelector(state);
+    const {pDecimals, maxToStake} = stakeDataSelector(state);
+    const {isFetching} = feeStakeSelector(state);
+    if (isFetching) {
+      return;
+    }
     await dispatch(actionFetchingFee());
     const amountConverted = convert.toOriginalAmount(
-      convert.toNumber(amount.value),
+      convert.toHumanAmount(maxToStake, pDecimals),
       pDecimals,
     );
     const feeEst = await getEstimateFeeForNativeToken(
