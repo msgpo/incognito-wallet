@@ -1,10 +1,10 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 import { COLORS, FONT } from '@src/styles';
-
+const { width } = Dimensions.get('window');
 export default StyleSheet.create({
   floatBtn: {
     position: 'absolute',
-    bottom: 10,
+    bottom: width <= 320 ? 5 : 10,
     left: 0,
     flexDirection: 'row',
     justifyContent: 'flex-start',
