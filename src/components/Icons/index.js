@@ -21,3 +21,4 @@ export {default as OpenByWebIcon} from './icon.openByWeb';
 export {default as EmptyActivitiesIcon} from './icon.emptyActivities';
 export {default as ThreeDotsVerIcon} from './icon.threeDotsVerIcon';
 export {default as BackIcon} from './icon.back';
+export {default as ArrowRightPrimaryIcon} from './icon.arrowRightPrimaryIcon';

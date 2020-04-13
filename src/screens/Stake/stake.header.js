@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 import {FONT, COLORS} from '@src/styles';
 import RightMenu from '@src/screens/Stake/features/RightMenu';
 import {useNavigation} from 'react-navigation-hooks';
+import {isIOS} from '@src/utils/platform';
+import DeviceInfo from 'react-native-device-info';
 
 const styled = StyleSheet.create({
   container: {
@@ -14,8 +16,10 @@ const styled = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 20,
+    paddingTop: 40,
   },
-  center: {},
+  hasNotch: {
+  },
   title: {
     fontFamily: FONT.NAME.medium,
     fontSize: FONT.SIZE.medium,
@@ -30,8 +34,9 @@ const styled = StyleSheet.create({
 
 const StakeHeader = props => {
   const navigation = useNavigation();
+  const hasNotch = isIOS() && DeviceInfo.hasNotch();
   return (
-    <View style={styled.container}>
+    <View style={[styled.container, hasNotch ? styled.hasNotch : null]}>
       <View style={styled.left}>
         <BtnBack onPress={() => navigation.pop()} />
       </View>

@@ -68,7 +68,7 @@ const pUniswapItem = {
   image: icUniswap,
   title: 'pUniswap',
   route: ROUTE_NAMES.pUniswap,
-  event: CONSTANT_EVENTS.CLICK_HOME_UNISWAP
+  event: CONSTANT_EVENTS.CLICK_HOME_UNISWAP,
 };
 
 const buttons = [
@@ -94,7 +94,7 @@ const buttons = [
     image: icTrade,
     title: 'Trade',
     route: ROUTE_NAMES.Dex,
-    event: CONSTANT_EVENTS.CLICK_HOME_TRADE
+    event: CONSTANT_EVENTS.CLICK_HOME_TRADE,
   },
   pappItem,
   powerItem,
@@ -103,13 +103,6 @@ const buttons = [
     image: icStake,
     title: 'Stake',
     route: ROUTE_NAMES.Stake,
-    params: {
-      navigationOptions: {
-        title: 'Staking PRV',
-        headerRight: <RightMenu />,
-        headerBackground: '#00000000'
-      },
-    },
   },
 ];
 

@@ -4,7 +4,7 @@ import {COLORS, FONT} from '@src/styles';
 export const styled = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    backgroundColor: 'transparent',
   },
   wrapper: {
     flex: 1,
@@ -54,7 +54,7 @@ export const styled = StyleSheet.create({
     fontSize: FONT.SIZE.superLarge + 5,
     lineHeight: FONT.SIZE.superLarge + 10,
     color: COLORS.black,
-    marginTop: 10
+    marginTop: 10,
   },
   symbol: {
     fontFamily: FONT.NAME.regular,

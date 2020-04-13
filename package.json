@@ -41,6 +41,7 @@
     "deploy:prod": "yarn deployIOS:prod && yarn deployAndroid:prod"
   },
   "dependencies": {
+    "react-native-check-app-install": "0.0.5",
     "@josectobar/react-native-iot-wifi": "https://github.com/josectobar/react-native-iot-wifi.git",
     "@react-native-community/async-storage": "^1.3.4",
     "@react-native-community/netinfo": "^5.0.0",
@@ -142,7 +143,7 @@
     "recompose": "^0.30.0",
     "reduce-reducers": "^1.0.4",
     "redux": "^4.0.1",
-    "redux-form": "^8.2.4",
+    "redux-form": "8.2.4",
     "redux-mock-store": "^1.5.3",
     "redux-persist": "^6.0.0",
     "redux-thunk": "^2.3.0",

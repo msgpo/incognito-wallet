@@ -12,8 +12,7 @@ export const stakeSelector = createSelector(
 export const stakeDataSelector = createSelector(stakeSelector, stake => {
   const {data} = stake;
   const {balance} = data;
-  const staked =
-    convert.toOriginalAmount(balance, CONSTANT_COMMONS.PRV.pDecimals) !== 0;
+  const staked = balance !== 0;
   return {
     ...data,
     staked,

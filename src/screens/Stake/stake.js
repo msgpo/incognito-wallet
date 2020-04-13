@@ -80,20 +80,6 @@ const Stake = () => {
     }
   }, [balance]);
   return (
-    // <LinearGradient
-    //   colors={[
-    //     '#F7EAD5',
-    //     '#FFFFFF',
-    //     '#E8E8E8',
-    //     '#C5D1E0',
-    //     '#F6F6F6',
-    //     '#EAFBFB',
-    //   ]}
-    //   style={styled.container}
-    //   useAngle
-    //   angle={0}
-    //   angleCenter={{x: 0.5, y: 0.5}}
-    // >
     <View style={styled.container}>
       <Header />
       <ImageBackground source={sourceBackground} style={styled.background} />
@@ -109,9 +95,11 @@ const Stake = () => {
               {balanceCurrent}
             </Text>
             <Text style={styled.symbol}>{symbol}</Text>
-            <View style={styled.arrow}>
-              <ArrowUpIcon />
-            </View>
+            {staked && (
+              <View style={styled.arrow}>
+                <ArrowUpIcon />
+              </View>
+            )}
           </View>
           <Text style={styled.desc}>
             Current rate:
