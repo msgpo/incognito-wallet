@@ -8,10 +8,9 @@ PASS_HOSPOT=$PASS_HOSPOT
 " > .env
 
 if [[ ! -z "${IOS_BUILD_CONFIGURATION}" ]]; then
-  FILE=/Users/runner/runners/2.165.2/work/1/a/build/Incognito.ipa
+  FILE=$(find ~/*/work/1/a/build -type f -name "Incognito.ipa" -print -quit)
   LAST_COMMIT_MESSAGE="$(git show -s --format=%s)"
   APP_VERSION="$(sed 's/.*\"version\": \"\(.*\)\".*/\1/;t;d' ./package.json)"
-
   NEW_FILE_NAME=$APP_VERSION-IOS_BUILD_CONFIGURATION
 
   cp $FILE $NEW_FILE_NAME.ipa
