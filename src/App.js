@@ -39,7 +39,7 @@ const App = () => {
   }, []);
 
   const initNotification = () => {
-    notificationInitialize();
+    notificationInitialize(store);
   };
 
   return (

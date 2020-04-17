@@ -3,6 +3,7 @@ import { ExHandler } from '@src/services/exception';
 import routeNames from '@src/router/routeNames';
 import firebase from 'react-native-firebase';
 import { Platform } from 'react-native';
+import { accountSeleclor, selectedPrivacySeleclor } from '@src/redux/selectors';
 import { logEvent } from '@services/firebase';
 import {
   actionNavigate,
@@ -12,17 +13,18 @@ import {
   actionInit,
 } from '@src/screens/Notification';
 import { CONSTANT_COMMONS, CONSTANT_EVENTS } from '@src/constants';
+import { v4 } from 'uuid';
 import { mappingData, delay } from '../screens/Notification/Notification.utils';
 import LogManager from './LogManager';
 import NavigationService from './NavigationService';
 
 const notifications = firebase.notifications();
-
+let notificationId = {};
 export const notificationInitialize = async (store) => {
-  // checkPermission();
-  // registerNotificationInBackground();
-  // registerWatchingNotificationOpened();
-  // registerHearingNotification(store);
+  checkPermission();
+  registerNotificationInBackground();
+  registerWatchingNotificationOpened(store);
+  registerHearingNotification();
 };
 
 // Request permission
@@ -69,7 +71,7 @@ const registerNotificationInBackground = () => {
 };
 
 // I will handle the navigation if no token valid.
-const registerWatchingNotificationOpened = () => {
+const registerWatchingNotificationOpened = (store) => {
   var notificationOpenedListener = firebase.notifications().onNotificationOpened(async (notificationOpen) => {
     // Get information about the notification that was opened
     console.log('notificationOpenedListener: ' + LogManager.parseJsonObjectToJsonString(notificationOpen));
@@ -79,17 +81,16 @@ const registerWatchingNotificationOpened = () => {
       //   NavigationService.navigate(RouteKeys.DetailTransactionPopup, { transfer: JSON.parse(data.payload) || null });
       // Do something for logic
       // Dismiss this notification
-      // let a = normalizedData(notificationOpen.notification?.data);
-      // NavigationService.navigate(a.screenParams);
-      // firebase.notifications().removeDeliveredNotification(notificationOpen.notification && notificationOpen.notification._notificationId || '');
+      let notificationStandard = normalizedData(notificationOpen.notification?.data);
+      navigateToScreen(notificationStandard, store);
+      firebase.notifications().removeDeliveredNotification(notificationOpen.notification && notificationOpen.notification._notificationId || '');
     }
   });
 };
 
-const registerHearingNotification = (store) => {
-  console.log(LogManager.parseJsonObjectToJsonString(store));
+const registerHearingNotification = () => {
   var notificationDisplayedListener = firebase.notifications().onNotificationDisplayed((notification) => {
-    console.log('notificationDisplayedListener: ' + LogManager.parseJsonObjectToJsonString(notification));
+    // console.log('notificationDisplayedListener: ' + LogManager.parseJsonObjectToJsonString(notification));
     // Process your notification as required
     // ANDROID: Remote notifications do not contain the channel ID. You will have to specify this manually if you'd like to re-display the notification.
   });
@@ -99,30 +100,31 @@ const registerHearingNotification = (store) => {
     // I will check token exist here for displaying notification or not
     // Do something here ....
 
-    // if (Platform.OS === 'android') {
-    //   const channelId = new firebase.notifications.Android.Channel('Default', 'Default', firebase.notifications.Android.Importance.High);
-    //   firebase.notifications().android.createChannel(channelId);
-    //   let notificationDisplayed = new firebase.notifications.Notification({
-    //     data: notification.data,
-    //     sound: 'default',
-    //     show_in_foreground: true,
-    //     title: notification.title,
-    //     body: notification.body,
-    //   });
-    //   notificationDisplayed
-    //     .android.setPriority(firebase.notifications.Android.Priority.Max)
-    //     .android.setChannelId('Default')
-    //     .android.setVibrate(1000);
-    //   firebase.notifications().displayNotification(notificationDisplayed);
-    // } else {
-    //   const localNotification = new firebase.notifications.Notification()
-    //     .setNotificationId(notification._notificationId)
-    //     .setTitle(notification._title && notification._title || '')
-    //     .setBody(notification._body)
-    //     .setData(notification._data);
+    if (Platform.OS === 'android') {
+      const channelId = new firebase.notifications.Android.Channel('Default', 'Default', firebase.notifications.Android.Importance.Max)
+        .setDescription('Max priority chanel');
+      firebase.notifications().android.createChannel(channelId);
+      let notificationDisplayed = new firebase.notifications.Notification({
+        data: notification.data,
+        sound: 'default',
+        show_in_foreground: true,
+        title: notification.title,
+        body: notification.body,
+      });
+      notificationDisplayed
+        .android.setPriority(firebase.notifications.Android.Priority.Max)
+        .android.setChannelId(channelId)
+        .android.setVibrate(1000);
+      firebase.notifications().displayNotification(notificationDisplayed);
+    } else {
+      const localNotification = new firebase.notifications.Notification()
+        .setNotificationId(notification._notificationId)
+        .setTitle(notification._title && notification._title || '')
+        .setBody(notification._body)
+        .setData(notification._data);
 
-    //   firebase.notifications().displayNotification(localNotification);
-    // }
+      firebase.notifications().displayNotification(localNotification);
+    }
 
     // If want to remove every notification before, do it! by id and free
     // firebase.notifications().removeDeliveredNotification(localNotification.notificationId);
@@ -135,6 +137,61 @@ const registerHearingNotification = (store) => {
     backgroundNotificationHandler(message)
       .then();
   });
+};
+const navigateToScreen = async (item, store) => {
+  try {
+    const { id, type, publicKey, tokenId, screen, screenParams } = item;
+
+    await logEvent(CONSTANT_EVENTS.CLICK_NOTIFICATION, { type });
+
+    switch (type) {
+    case 'broadcast': {
+      NavigationService.navigate(routeNames.Home);
+      return;
+    }
+    case 'reward-node':
+    case 'unstake-success': {
+      await delay(50);
+      NavigationService.navigate(routeNames.Node);
+      break;
+    }
+    case 'withdraw-coin':
+    case 'withdraw-success':
+    case 'balance-update':
+    case 'deposit-update': {
+      let rootState = store.getState();
+      if (rootState) {
+        const accountList = accountSeleclor.listAccount(rootState);
+        const token = {
+          ...selectedPrivacySeleclor.getPrivacyDataByTokenID(rootState),
+          id: tokenId,
+          ID: tokenId,
+        };
+        NavigationService.navigate(routeNames.WalletDetail, { followToken: token });
+      } else {
+        NavigationService.navigate(routeNames.WalletDetail);
+      }
+      break;
+    }
+    case 'go-to-screen': {
+      const params = {};
+
+      const rawParams = (screenParams || '').split('&');
+
+      rawParams.forEach(param => {
+        const parts = param.split('=');
+        params[parts[0]] = parts[1];
+      });
+
+      NavigationService.navigate(screen, params);
+      break;
+    }
+    default:
+      break;
+    }
+  } catch (error) {
+    new ExHandler(error).showErrorToast();
+  }
 };
 
 export const backgroundNotificationHandler = async (message) => {

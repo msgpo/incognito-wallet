@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { Toast, Image, View } from '@src/components/core';
-import { getBalance , getBalance as getAccountBalance } from '@src/redux/actions/account';
+import {
+  getBalance, getBalance as getAccountBalance,
+  actionSwitchAccount,
+  actionReloadFollowingToken,
+} from '@src/redux/actions/account';
 import LoadingContainer from '@src/components/LoadingContainer';
 import accountService from '@src/services/wallet/accountService';
 import { setWallet } from '@src/redux/actions/wallet';
@@ -12,9 +16,12 @@ import TokenInfo from '@src/components/HeaderRight/TokenInfo';
 import { getBalance as getTokenBalance } from '@src/redux/actions/token';
 import unfollowTokenIcon from '@src/assets/images/icons/unfollowToken.png';
 import { ExHandler } from '@src/services/exception';
+import { setSelectedPrivacy } from '@src/redux/actions/selectedPrivacy';
+import { actionAddFollowToken } from '@src/redux/actions';
 import { COLORS } from '@src/styles';
 import { CONSTANT_COMMONS } from '@src/constants';
 import VerifiedText from '@src/components/VerifiedText';
+import LogManager from '@src/services/LogManager';
 import WalletDetail from './WalletDetail';
 import styles from './style';
 
@@ -28,14 +35,14 @@ const THEMES = {
     backgroundColor: COLORS.dark4
   }
 };
-
 class WalletDetailContainer extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
 
     this.state = {
       theme: THEMES.dark
     };
+
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -56,6 +63,17 @@ class WalletDetailContainer extends Component {
 
   componentDidMount() {
     this.setHeaderData();
+
+    this.followTokenIfNeeded();
+  }
+
+  followTokenIfNeeded =  () => async (dispatch) => {
+    const { navigation } = this.props;
+    let token = navigation.state.params;
+    if (token?.isToken || token?.id !== CONSTANT_COMMONS.PRV_TOKEN_ID) {
+      await dispatch(actionAddFollowToken(token.id));
+    }
+    await dispatch(actionReloadFollowingToken());
   }
 
   componentDidUpdate(prevProps) {

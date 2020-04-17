@@ -5,7 +5,6 @@ import AccountSelect from '@screens/Wallet/AccountSelect';
 import { NotificationIcon } from '@src/components/Icons';
 import { useSelector } from 'react-redux';
 import { dataNotificationsSelector } from '@src/screens/Notification/Notification.selector';
-import withFCM from '@src/screens/Notification/Notification.withFCM';
 import { compose } from 'recompose';
 import styles from './style';
 
@@ -25,4 +24,4 @@ const withTopRoundHeaderLayout = WrappedComp => props => {
   );
 };
 
-export default compose(withFCM, withTopRoundHeaderLayout);
+export default compose(withTopRoundHeaderLayout);
