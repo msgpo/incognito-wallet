@@ -325,14 +325,17 @@ class Withdraw extends React.Component {
   checkIfValidAddressETH = (address, isETH) => {
     if (isETH && address != '') {
       try {
-        let url = CONSTANT_CONFIGS.ETHERSCAN_URL + '/address/' + address;
-        fetch(url).
-          then(async (resp) => {
-            return resp.text();
+        let url = CONSTANT_CONFIGS.API_BASE_URL + '/eta/is-eth-account?address=' + address;
+        fetch(url)
+          .then((response) => {
+            return response.json();
           })
-          .then((text) => {
-            let hasAddressValid = text.includes('\nAddress\n<span id=\'mainaddress\' class=\'text-size-address text-secondary text-break mr-1\' data-placement=\'top\'>' + address + '</span>');
-            this.setState({ shouldBlockETHWrongAddress: !hasAddressValid });
+          .then((data) => {
+            if (data && data.Result === false) {
+              this.setState({ shouldBlockETHWrongAddress: true });
+            } else {
+              this.setState({ shouldBlockETHWrongAddress: false });
+            }
           })
           .catch(() => {
             alert('Could not validate ETH address for now, please try again');
@@ -404,9 +407,12 @@ class Withdraw extends React.Component {
                   onOpenAddressBook={onShowFrequentReceivers}
                   showNavAddrBook
                 />
-                {(isErc20Token || externalSymbol === CONSTANT_COMMONS.CRYPTO_SYMBOL.ETH) &&
-                  <Text style={[style.warning, shouldBlockETHWrongAddress ? { color: COLORS.red } : {}]}>{shouldBlockETHWrongAddress ? 'Please withdraw to ethereum wallet address only. \nCan not withdraw to smart contract address.' : 'Please withdraw to ethereum wallet address only. Withdrawals to smart contract addresses will be lost.'}</Text>
-                }
+                {(isErc20Token || externalSymbol === CONSTANT_COMMONS.CRYPTO_SYMBOL.ETH) && (
+                  <Text style={[style.warning, shouldBlockETHWrongAddress ? { color: COLORS.red } : {}]}>{
+                    shouldBlockETHWrongAddress ? 'Please withdraw to ethereum wallet address only. \nCan not withdraw to smart contract address.' :
+                      'Please only withdraw to an Ethereum wallet address. Withdrawals to smart contract addresses may be lost.'}
+                  </Text>
+                )}
                 <Field
                   component={InputMaxValueField}
                   name="amount"
