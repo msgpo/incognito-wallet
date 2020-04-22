@@ -1,12 +1,12 @@
 import { COLORS, FONT } from '@src/styles';
 import { StyleSheet, Dimensions } from 'react-native';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 const style = StyleSheet.create({
   btn: {
     paddingVertical: 20,
     alignItems: 'center',
-    height: 130,
+    height: 120,
     width: (width - 40) / 3,
     marginBottom: 15,
     alignSelf: 'flex-start',

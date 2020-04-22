@@ -1,15 +1,16 @@
 import React from 'react';
-import { ScrollView, Dimensions, PixelRatio, Platform} from 'react-native';
+import { ScrollView, Dimensions, PixelRatio, Platform, SafeAreaView, TouchableWithoutFeedback } from 'react-native';
 import LinkingService from '@src/services/linking';
 import AppUpdater from '@components/AppUpdater/index';
-import {isIOS} from '@utils/platform';
+import { isIOS } from '@utils/platform';
 import deviceInfo from 'react-native-device-info';
 import PropTypes from 'prop-types';
-import { TouchableOpacity, View } from '@src/components/core';
+import { TouchableOpacity, View, Text } from '@src/components/core';
 import icShield from '@assets/images/icons/ic_shield_btn.png';
 import icSend from '@assets/images/icons/ic_send_btn.png';
 import icReceive from '@assets/images/icons/ic_receive_btn.png';
 import icTrade from '@assets/images/icons/ic_trade.png';
+import icSetting from '@assets/images/icons/ic_setting_btn.png';
 import icInvent from '@assets/images/icons/ic_invent_btn.png';
 import icPower from '@assets/images/icons/ic_power.png';
 import icBuy from '@assets/images/icons/ic_buy_prv.png';
@@ -33,6 +34,12 @@ import { COLORS } from '@src/styles';
 import Tooltip from '@components/Tooltip';
 import styles from './style';
 
+const settingItem = {
+  image: icSetting,
+  title: 'Settings',
+  desc: '',
+  route: ROUTE_NAMES.Setting,
+};
 const sendItem = {
   image: icSend,
   title: 'Send',
@@ -77,14 +84,14 @@ const sendFeedback = async () => {
   const title = `Incognito wallet ${buildVersion} ${isIOS() ? 'iOS' : 'Android'} ${deviceInfomation} feedback`;
   const email = 'go@incognito.org';
   let content = 'Please include as much detail as possible. Thanks for your time!';
-  
+
 
   LinkingService.openUrl(`mailto:${email}?subject=${title}&body=${content}`);
 
 };
 const pUniswapItem = {
   image: icKyber,
-  title: 'pKyber',
+  title: 'pKyber (testnet)',
   route: ROUTE_NAMES.pUniswap,
   event: CONSTANT_EVENTS.CLICK_HOME_UNISWAP,
 };
@@ -123,7 +130,7 @@ const buttons = [
   },
   powerItem,
   pStakeItem,
-  pappItem,
+  // pUniswapItem,
   {
     image: icFeedback,
     title: 'Feedback',
@@ -133,7 +140,7 @@ const buttons = [
     // }
     onPress: () => sendFeedback()
   },
-  pUniswapItem,
+  settingItem
 ];
 
 const tooltipType = '2';
@@ -199,35 +206,35 @@ const Home = ({ navigation }) => {
   }, []);
 
   return (
-    <TouchableOpacity style={{ flex: 1 }} onPress={closeTooltip}>
-      <View style={styles.header}>
-        <AccountSelect customTitleStyle={styles.accTitle} icoColor={COLORS.black} />
-        <SettingIcon />
-      </View>
-      <ScrollView contentContainerStyle={{justifyContent: 'center'}}>
-        <View style={styles.btnContainer}>
-          {buttons.map(item => (
-            <View style={styles.btn} key={item.title}>
-              {item === pStakeItem &&
-                viewUniswap !== tooltipType && (
-                <Tooltip
-                  title="New"
-                  desc="Join a PRV staking pool. Get a 57% annual return. Interest paid every second."
+    <TouchableWithoutFeedback style={{ flex: 1 }} onPress={closeTooltip}>
+      <ScrollView>
+        <View>
+          <Text numberOfLines={3} multiLine style={styles.titleHeader}>{'Incognito mode \nfor your crypto'}
+          </Text>
+          <View style={styles.btnContainer}>
+            {buttons.map(item => (
+              <View style={styles.btn} key={item.title}>
+                {item === pStakeItem &&
+                  viewUniswap !== tooltipType && (
+                  <Tooltip
+                    title="New"
+                    desc="Join a PRV staking pool. Get a 57% annual return. Interest paid every second."
+                  />
+                )}
+                <IconTextButton
+                  image={item.image}
+                  title={item.title}
+                  disabled={isDisabled(item)}
+                  onPress={
+                    item.onPress || (() => goToScreen(item.route, item.params))
+                  }
                 />
-              )}
-              <IconTextButton
-                image={item.image}
-                title={item.title}
-                disabled={isDisabled(item)}
-                onPress={
-                  item.onPress || (() => goToScreen(item.route, item.params))
-                }
-              />
-            </View>
-          ))}
+              </View>
+            ))}
+          </View>
         </View>
       </ScrollView>
-    </TouchableOpacity>
+    </TouchableWithoutFeedback>
   );
 };
 

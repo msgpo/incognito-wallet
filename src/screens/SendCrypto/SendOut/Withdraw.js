@@ -13,6 +13,7 @@ import {
   validator,
 } from '@components/core/reduxForm';
 import EstimateFee from '@components/EstimateFee';
+import { selectedPrivacySeleclor } from '@src/redux/selectors';
 import LoadingTx from '@components/LoadingTx';
 import { CONSTANT_COMMONS, CONSTANT_EVENTS, CONSTANT_CONFIGS } from '@src/constants';
 import { ExHandler } from '@services/exception';
@@ -36,7 +37,6 @@ import ROUTES_NAME from '@routers/routeNames';
 import { RefreshControl } from 'react-native';
 import Modal, { actionToggleModal } from '@src/components/Modal';
 import { COLORS } from '@src/styles';
-import LogManager from '@src/services/LogManager';
 import style from './style';
 import Receipt from './Withdraw.receipt';
 
@@ -66,6 +66,8 @@ class Withdraw extends React.Component {
       supportedFeeTypes: [],
       feeForBurn: 0,
       shouldBlockETHWrongAddress: false,
+      tempAddress: '',
+      listMinAmount: [],
     };
   }
 
@@ -80,12 +82,35 @@ class Withdraw extends React.Component {
     };
   }
 
-  componentDidMount() {
+  componentDidMount = async () => {
+    await this.getMinAmountAPI();
+    this.setBothAmount();
+    this.getSupportedFeeTypes();
+  }
+
+  getMinAmountAPI = async () => {
+    await fetch(CONSTANT_CONFIGS.API_BASE_URL + '/service/min-max-amount')
+      .then(res => res.json())
+      .then(fin => {
+        if (fin?.Result && Array.isArray(fin.Result)) {
+          this.setState({
+            listMinAmount: fin.Result
+          });
+        }
+      })
+      .catch(() => {
+
+      });
+  }
+
+  setMaxAmount() {
+    this.setFormValidator({ maxAmount: this.getMaxAmount() });
+  }
+  setBothAmount() {
     this.setFormValidator({
       maxAmount: this.getMaxAmount(),
       minAmount: this.getMinAmount(),
     });
-    this.getSupportedFeeTypes();
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -100,19 +125,16 @@ class Withdraw extends React.Component {
 
     if (selectedPrivacy?.pDecimals !== oldSelectedPrivacy?.pDecimals) {
       // need to re-calc min amount if token decimals was changed
-      this.setFormValidator({ minAmount: this.getMinAmount() });
+      this.setMaxAmount();
     }
 
     if (fee !== oldFee || feeUnitByTokenId !== oldFeeUnitByTokenId) {
       // need to re-calc max amount can be send if fee was changed
-      this.setFormValidator({ maxAmount: this.getMaxAmount() });
+      this.setMaxAmount();
     }
 
     if (oldSelectedPrivacy !== selectedPrivacy && selectedPrivacy) {
-      this.setFormValidator({
-        maxAmount: this.getMaxAmount(),
-        minAmount: this.getMinAmount(),
-      });
+      this.setBothAmount();
       this.getSupportedFeeTypes();
     }
   }
@@ -123,6 +145,13 @@ class Withdraw extends React.Component {
     let min = 0;
     if (selectedPrivacy?.pDecimals) {
       min = 1 / 10 ** selectedPrivacy.pDecimals;
+    }
+    // Check in min-amount list
+    const { listMinAmount } = this.state;
+    for (let i = 0; i < listMinAmount.length; i++) {
+      if (selectedPrivacy?.tokenId === listMinAmount[i]?.TokenID) {
+        min = listMinAmount[i]?.MinAmount;
+      }
     }
 
     return minAmount ? Math.max(min, minAmount) : min;
@@ -267,7 +296,10 @@ class Withdraw extends React.Component {
     if (fee !== 0 && !fee) {
       return true;
     }
-
+    const { shouldBlockETHWrongAddress } = this.state;
+    if (shouldBlockETHWrongAddress) {
+      return true;
+    }
     return false;
   };
 
@@ -315,13 +347,21 @@ class Withdraw extends React.Component {
   };
 
   handleSelectToken = tokenId => {
-    const { setSelectedPrivacy } = this.props;
-    console.log(tokenId);
+    const { setSelectedPrivacy, selectedPrivacy } = this.props;
+    const { tempAddress } = this.state;
     setSelectedPrivacy(tokenId);
     this.setState({
       shouldBlockETHWrongAddress: false
     });
+
+    this.clearAddressField();
   };
+
+  clearAddressField = () => {
+    const { rfChange } = this.props;
+    rfChange('withdraw', 'toAddress', null);
+    this.setState({ shouldBlockETHWrongAddress: false });
+  }
 
   checkIfValidAddressETH = (address, isETH, isETHValid) => {
     if (isETH && isETHValid && address != '') {
@@ -332,7 +372,6 @@ class Withdraw extends React.Component {
             return response.json();
           })
           .then((data) => {
-            console.log(LogManager.parseJsonObjectToJsonString(data));
             if (data && data.Result === false) {
               this.setState({ shouldBlockETHWrongAddress: true });
             } else {
@@ -364,6 +403,7 @@ class Withdraw extends React.Component {
       account,
       selectable,
       onShowFrequentReceivers,
+      onSelectedValue,
       reloading,
     } = this.props;
     const { externalSymbol, isErc20Token, name: tokenName } =
@@ -398,23 +438,31 @@ class Withdraw extends React.Component {
             {({ handleSubmit, submitting }) => (
               <>
                 <Field
+                  // This is temporarily
+                  autoFocus
                   component={InputQRField}
-                  onChange={(text) => { 
+                  onChange={(event, text) => {
+                    this.setState({ tempAddress: text }, () => {
+                    });
                     // I wanna check text is ETH valid coin
                     let ETHValid = walletValidator.validate(text, 'ETH', 'both');
-                    this.checkIfValidAddressETH(text, isETH, ETHValid); 
+                    this.checkIfValidAddressETH(text, isETH, ETHValid);
                   }}
                   name="toAddress"
                   label="To"
-                  placeholder={`Enter your ${tokenName}  address`}
+                  placeholder={`Enter your ${tokenName} address`}
                   style={style.input}
                   validate={addressValidator}
-                  onOpenAddressBook={onShowFrequentReceivers}
+                  onOpenAddressBook={()=>{
+                    // onChange will not works for now, we have to refactor after.
+                    this.clearAddressField(); 
+                    // Clear address field for a while before going to refactor.
+                    onShowFrequentReceivers(); }}
                   showNavAddrBook
                 />
                 {(isErc20Token || externalSymbol === CONSTANT_COMMONS.CRYPTO_SYMBOL.ETH) && (
                   <Text style={[style.warning, shouldBlockETHWrongAddress ? { color: COLORS.red } : {}]}>
-                    Please withdraw to wallet addresses only.
+                    Please withdraw to a wallet address, not a smart contract address.
                   </Text>
                 )}
                 <Field

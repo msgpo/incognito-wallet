@@ -1,5 +1,5 @@
 import {StyleSheet, Dimensions} from 'react-native';
-import {COLORS} from '@src/styles';
+import {COLORS, FONT} from '@src/styles';
 
 const {width} = Dimensions.get('window');
 const style = StyleSheet.create({
@@ -14,8 +14,7 @@ const style = StyleSheet.create({
     alignItems: 'center',
     alignContent: 'center',
     width: width,
-    height: '100%',
-    marginTop: 10,
+    marginTop: 20,
   },
   content: {
     flex: 1,
@@ -30,14 +29,19 @@ const style = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignContent: 'center',
-    height: 70,
+    height: 120,
     alignItems: 'center',
-    paddingEnd: 35,
-    paddingLeft: 35,
-    justifyContent: 'space-between',
+    
   },
   accTitle: {
     color: COLORS.black
+  },
+  titleHeader: {
+    fontFamily: FONT.NAME.bold,
+    fontSize: 26,
+    marginTop: 20,
+    marginLeft: 35,
+    marginEnd: 35,
   }
 });
 
